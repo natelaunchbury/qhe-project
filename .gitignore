@@ -1,0 +1,8 @@
+*.toc
+*.nav
+*.aux
+*.bbl
+*.blg
+*.log
+*.pdf
+*.sw?

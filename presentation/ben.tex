@@ -1,0 +1,173 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% QOTP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\sectionframe{A Homomorphic Primitive: \\ Quantum One-time Pad}
+
+\begin{frame}
+\frametitle{Classical One-time Pad}
+\vspace{7mm}
+\begin{itemize}
+\item \textbf{Con:} Large, single-use key (as many bits as message)
+\item \textbf{Pro:} Arbitrary bit flips (homomorphism)
+\end{itemize}
+\vspace{7mm}
+\textit{Intuition:} Perhaps a quantum extension of one-time pad would be
+similarly homomorphic.
+\end{frame}
+
+\begin{frame}
+\frametitle{Quantum One-time Pad}
+\only<1>{
+Can we extend classical one-time pad to a quantum setting?
+\vspace{7mm}
+\begin{itemize}
+\item Method established as early as 2000
+\begin{itemize}
+\item CITE Ambainis et al., 2000
+\end{itemize}
+\item Homomorphic properties examined starting in 2014
+\begin{itemize}
+\item CITE Liang et al., 2014
+\item CITE Broadbent and Jeffery, 2015
+\end{itemize}
+\end{itemize}
+}
+\only<2>{
+Facts:
+\begin{itemize}
+\item There is a quantum one-time pad that extends classical counterpart
+\item It has information-theoretic security
+\item It is \textit{somewhat} homomorphic
+\end{itemize}
+}
+\end{frame}
+
+\sectionframe{From Classical to Quantum One-time Pad}
+
+\begin{frame}
+\frametitle{Classical One-time Pad}
+\begin{columns}
+\column{0.7\textwidth}
+\only<1>{
+Encryption: \(c = m \oplus k\)
+Decryption: \(m = c \oplus k\)
+}
+\only<2>{\[\Qcircuit @C=2mm @R=3mm {
+   \lstick{k} & \multigate{1}{\mathcal R} & \qw & \rstick{k}
+\\ \lstick{m} & \ghost{R}        & \qw & \rstick{c}
+}\]\vspace{7mm}\[(k,m) \xmapsto{R} (k, c = m \oplus k)\]}
+\only<3>{\[\Qcircuit @C=2mm @R=3mm {
+   \lstick{k} & \ctrl{1} & \qw & \rstick{k}
+\\ \lstick{m} & \targ    & \qw & \rstick{c}
+}\]}
+\column{0.3\textwidth}
+key:        \[k \in \{0,1\}\] \vspace{5mm} \\
+message:    \[m \in \{0,1\}\] \vspace{5mm} \\
+ciphertext: \[c \in \{0,1\}\]
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{IT-Secure Quantum One-time Pad}
+\begin{columns}
+\column{0.7\textwidth}
+\center
+\only<1>{\[\Qcircuit @C=2mm @R=3mm {
+   \lstick{k}      & \control\cw & \cw & \rstick{k}
+\\ \lstick{\ket m} & \targ\cwx   & \qw & \rstick{\ket c}
+}\]}
+\only<2>{
+\[\rho = \begin{pmatrix} a&b\\c&d \end{pmatrix}, b = \bar{c}, a+d = 1\]
+\begin{align*}
+\frac{1}{2}(X \rho X + \rho)
+        &= \frac{1}{2}\left( \begin{pmatrix} d&c\\b&a \end{pmatrix}
+                + \begin{pmatrix} a&b\\c&d \end{pmatrix} \right)
+\\      &= \frac{1}{2}\begin{pmatrix} 1&b+c\\b+c&1 \end{pmatrix}
+\end{align*}
+Not totally mixed.
+}
+\only<3>{\[\Qcircuit @C=2mm @R=3mm {
+   \lstick{k_1}    & \control\cw & \cw          & \cw & \rstick{k_1}
+\\ \lstick{k_2}    & \cw\cwx     & \control\cw  & \cw & \rstick{k_2}
+\\ \lstick{\ket m} & \targ\cwx   & \gate{Z}\cwx & \qw & \rstick{\ket c}
+}\]}
+\only<4>{
+\[\rho = \begin{pmatrix} a&b\\c&d \end{pmatrix}, b = \hat{c}, a+d = 1\]
+\begin{align*}
+\frac{1}{4}(\QGate{X}Z \rho ZX + X \rho X + Z \rho Z + \rho)
+        = \frac{1}{2}\begin{pmatrix} 1&0\\0&1 \end{pmatrix}
+\end{align*}
+Totally mixed!
+}
+\only<5>{
+Encryption: \(\rho \xmapsto{k_1,k_2} X^{k_1}Z^{k_2} \rho Z^{k_2}X^{k_1}\)
+Decryption: \(\sigma \xmapsto{k_1,k_2} X^{k_1}Z^{k_2} \sigma Z^{k_2}X^{k_1}\)
+}
+\column{0.3\textwidth}
+\only<1-2>{
+key:        \[k \in \{0,1\}\] \vspace{5mm} \\
+message:    \[m = \alpha\ket0 + \beta\ket1\] \vspace{5mm} \\
+ciphertext: \[c = \alpha'\ket0 + \beta'\ket1\]
+}
+\only<3->{
+key:        \[k_1,k_2 \in \{0,1\}\] \vspace{5mm} \\
+message:    \[m = \alpha\ket0 + \beta\ket1\] \vspace{5mm} \\
+ciphertext: \[c = \alpha'\ket0 + \beta'\ket1\]
+}
+\end{columns}
+\end{frame}
+
+\sectionframe{But what about homomorphism?}
+
+\begin{frame}
+\frametitle{Homomorphism}
+\begin{columns}
+\column{0.7\textwidth}
+\only<1>{
+\textit{Example:} Suppose our key is $(k_1,k_2) = (0,1)$, and we want to apply
+$H$ to our encrypted message.
+}
+\only<2>{
+\[\begin{tabular}{cc} $k_1 = 0$ & $k_2 = 1$ \end{tabular}\]
+\[\sigma = X^{k_1}Z^{k_2} \rho Z^{k_2}X^{k_1} = Z \rho Z\]
+}
+\only<3>{
+\[\begin{tabular}{cc} $k_1 = 0$ & $k_2 = 1$ \end{tabular}\]
+\[\sigma' = HZ \rho ZH\]
+}
+\only<4>{
+\[\begin{tabular}{cc} $k_1 = 0$ & $k_2 = 1$ \end{tabular}\]
+\[\sigma' = XH \rho HX\]
+}
+\only<5>{
+\[\begin{tabular}{cc} $k'_1 = 1$ & $k'_2 = 0$ \end{tabular}\]
+\[\sigma' = X \rho' X\]
+\textit{Notice what happened to our key}
+}
+\only<6>{
+Does this work for all unitaries? Suppose we want to apply $Y$.
+}
+\only<7>{
+\[\begin{tabular}{cc} $k_1 = 0$ & $k_2 = 1$ \end{tabular}\]
+\[\sigma = X^{k_1}Z^{k_2} \rho Z^{k_2}X^{k_1} = Z \rho Z\]
+}
+\only<8>{
+\[\begin{tabular}{cc} $k_1 = 0$ & $k_2 = 1$ \end{tabular}\]
+\[\sigma' = YZ \rho ZY\]
+}
+\column{0.3\textwidth}
+\[X = \begin{pmatrix} 0&1\\1&0 \end{pmatrix}\]
+\vspace{3mm}
+\[Y = \begin{pmatrix} 0&i\\-i&0 \end{pmatrix}\]
+\vspace{3mm}
+\[Z = \begin{pmatrix} 1&0\\0&-1 \end{pmatrix}\]
+\vspace{3mm}
+\[H = \frac{1}{\sqrt{2}}\begin{pmatrix} 1&1\\1&-1 \end{pmatrix}\]
+\vspace{3mm}
+Original message: $\rho$
+\vspace{3mm}
+Ciphertext: $\sigma$
+\vspace{3mm}
+Target message: $\rho' = H \rho H$
+\end{columns}
+\end{frame}

@@ -1,0 +1,166 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Classical FHE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\sectionframe{Classical Fully Homomorphic Encryption}
+
+\begin{frame}
+\frametitle{Homomorphisms}
+\textbf{Homomorphism:} structure preserving map
+\pause
+\begin{itemize}
+  \item determinent: $|AB| = |A|\cdot |B|$
+\pause
+  \item $e^{x+y} = e^x\cdot e^y$
+\pause
+  \item $length (a\pp b) = length(a) + length(b)$
+\pause
+\end{itemize}
+$\ $\\
+This idea is in Algebra, Topology, Logic, Linear Algebra $\ldots$
+\end{frame}
+
+\begin{frame}
+\frametitle{Homomorphic Encryption}
+If a homomorphism is a structure preserving,\\
+what structure are we preserving?\\
+\pause
+$\ $\\
+$\ $\\
+correctness property for encryption\\
+\pause
+$\ $\\
+If we encrypt something, then decrypt,\\
+we should get the original message.\\
+\pause
+$\ $\\
+$Dec_{sk} \circ Enc_{pk} = id$\\
+\end{frame}
+
+\begin{frame}
+\frametitle{Homomorphic Encryption}
+can we run a computation on the encrypted text?\\
+\pause
+We encrypt, run our computation $f$, and decrypt.\\
+What structure is preserved?\\
+$\ $\\
+\pause
+$Dec_{sk} \circ Eval_{evk}(f) \circ Enc_{pk} = f$\\
+$\ $\\
+$\ $\\
+\pause
+In reality this is too strong, we instead say\\
+$\ $\\
+$P[Dec_{sk} (Eval_{evk}(f, Enc_{pk}(m))) \ne m] \le \eta(N)$\\
+$\ \ \text{where}\ \eta$ is negligable.
+\end{frame}
+
+\begin{frame}
+\frametitle{Trivial Homomorphic Encryption}
+There's a very simple solution to this.\\
+\pause
+let $Enc$ and $Dec$ be a secure encryption scheme.\\
+$\ $\\
+\pause
+$Enc_k'(m) = Enc_k(m)$ \\
+\pause
+$Eval_k(f,c) = c \pp "\$f"$ \\
+\pause
+$Dec_k'(c\$f) = f(Dec_k(c))$ \\
+$\ $\\
+\pause
+This is the \textit{trivial homomorphic encryption scheme}\\
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Trivial Homomorphic Encryption}
+
+This scheme is correct\\
+$\ $\\
+\pause
+$Dec_{ks} \circ Eval_{evk}(f) \circ Enc_{pk} = f \circ Dec_{sk} \circ Enc_{pk} = f$\\
+$\ $\\
+\pause
+But this isn't what we meant\\
+$\ $\\
+\pause
+To avoid this we'll add a new requirement\\
+The size of the ciphertext must not depend on the function.\\
+Compactness: $|Eval_k(f,c)| = Poly(N)$\\
+$\ $\\
+\pause
+side effect: we can only encrypt text up to length $Poly(N)$\\
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Representation}
+We represent our functions as circuits\\
+$\ $\\
+\pause
+\textit{depth}: maxmimum length from input to output of a circuit\\
+$\ $\\
+\pause
+$Eval_{evk}(f)$ does not have to be a new circuit\\
+it is only true that $Eval_{evk}(f,c)$ is a valid ciphertext\\
+$\ $\\
+\pause
+Furthermore $Dec_{sk}\circ Enc_{pk} = id$ is no longer required.\\
+only $Dec_{sk}\circ Eval_{evk}(f) \circ Enc_{pk} = f$\\
+$\ $\\
+This is because $Dec_{sk}\circ Eval_{evk}(id) \circ Enc_{pk} = id$\\
+\end{frame}
+
+\begin{frame}
+\frametitle{Homomorphic Encryption}
+
+There are many ways to fulfill correctness and compactness.
+\begin{itemize}
+\pause
+  \item Somewhat Homomorphic: Correct, but not compact
+\pause
+  \item $\mathcal{F}$-Homomorphic: Correct and compact for circuits in $\mathcal{F}$
+\pause
+  \item Levelled Homomorphic: $\mathcal{F}$-Homomorphic for limited depth
+\pause
+  \item Fully Homomorphic: Correct and compact for all circuits
+\pause
+  \item i-hop Homomorphic: Correct and compact $i$ calls to $Eval_{evk}$
+\end{itemize}
+$\ $\\
+\pause
+Our goal is Fully Homomorphic Encryption
+\end{frame}
+
+\begin{frame}
+\frametitle{Implementation}
+Most implementations of this come from lattice problems\\
+$\ $\\
+We don't have time to go over the necessary theory here.\\
+$\ $\\
+So we'll give an idea\\
+\end{frame}
+
+\begin{frame}
+\frametitle{Implementation}
+An HE scheme is \textit{bootstrapable} if it can homomorphically evaluate
+$Dec_{sk}$ along with at least one NAND gate.\\
+$\ $\\
+\pause
+$Enc_{pk}' = Enc_{pk} \circ Enc_{pk}$\\
+$\ $\\
+\pause
+$Eval_{evk}(f)' = Eval_k \circ \ldots \circ Eval_0$\\
+$\ \ \text{where}\ (N_1\ldots N_k) = NANDS(f)$\\
+$\ \ \ \ \ \ \ Eval_i = Eval_{evk}(Enc_{pk}\circ N_i\circ Dec_{sk})$\\
+$\ $\\
+\pause
+$Dec_{sk}' = Dec_{sk} \circ Dec_{sk}$\\
+$\ $\\
+\pause
+We can't evaluate $Dec_{sk}$ because then we'd need to know $sk$\\
+\pause
+but we can encrypt $sk$ since we can evaluate $Dec$\\
+\pause
+This process is called \textit{recryption}\\
+\end{frame}

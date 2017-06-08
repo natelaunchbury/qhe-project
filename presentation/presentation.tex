@@ -1,0 +1,71 @@
+\documentclass{beamer}
+ 
+\usepackage[utf8]{inputenc}
+\usepackage{tikz, tikz-3dplot}
+\usepackage{color}
+\usepackage[braket]{qcircuit}
+\usepackage{helvet}
+\usepackage{mathtools}
+
+\definecolor{red}{rgb}{0.7,0.0,0.05}
+ 
+\beamertemplatenavigationsymbolsempty
+\setbeamertemplate{footline}[frame number]
+\setbeamercolor{title}{fg=red}
+\setbeamercolor{titlelike}{fg=red}
+\setbeamercolor{item}{fg=red}
+\setbeamertemplate{itemize item}{\raisebox{.4mm}{\textbullet}}
+\setbeamertemplate{itemize subitem}{$\circ$}
+
+\newcommand{\sectionframe}[1]
+        {\begin{frame}\vfill\center\Huge\textcolor{red}{#1}\vfill\end{frame}}
+\newcommand\pp{\ensuremath{\mathbin{+\mkern-10mu+}}}
+\newcommand{\im}{\mathnormal{i}}
+\newcommand{\QGate}[1]{\ensuremath{#1}}
+\newcommand{\ClSet}[1]{\mathcal{C}}
+\newcommand{\ClGate}{\QGate{C}}
+\newcommand{\PadSet}{\mathcal{Q}}
+\newcommand{\PadGate}{\QGate{Q}}
+ 
+\title{\huge Quantum Homomorphic Encryption}
+\author{
+Ben Hamlin, Steven Libby, Nate Launchbury
+\\ \small \texttt{$\langle$ hamlinb, slibby, njl2 $\rangle$ @pdx.edu}
+}
+\institute{Portland State University}
+\date{2017}
+ 
+\begin{document}
+ 
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Overview}
+\vfill
+\begin{itemize}
+\item Classical Fully Homomorphic Encryption
+\begin{itemize}
+\item What is it?
+\item How is it useful?
+\item \textit{e.g.:} Classical one-time pad
+\end{itemize}
+\item Quantum one-time pad
+\begin{itemize}
+\item What is it?
+\item Homomorphism with Clifford gates
+\item Error with $T$-gates
+\item IT-security and limitations
+\end{itemize}
+\item Correcting $T$-errors for quantum FHE
+\begin{itemize}
+\item Limited $T$-count or -depth [Broadbent and Jeffereys, 2015]
+\item QFHE with gadgets [Dulek et al., 2016]
+\end{itemize}
+\end{itemize}
+\vfill
+\end{frame}
+
+\include{steven}
+\include{ben}
+\include{nate}
+\end{document}

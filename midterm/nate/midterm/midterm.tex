@@ -1,0 +1,236 @@
+\documentclass{article}
+
+\usepackage{natbib}
+\usepackage{amsmath}
+\usepackage{paralist}
+
+\newcommand{\ket}[1]{| #1 \rangle}
+
+\title{Alternative QOTP schemes for QHE}
+\author{Ben Hamlin, Nate Launchbury, and Stephen Libby}
+\date{}
+
+\begin{document}
+\maketitle
+
+Quantum computing is a promising new avenue for algorithm development.  However,
+quantum computers will not be available to the general public for the
+foreseeable future.  One potential solution allows users to access a quantum
+server to run their computations in a “quantum cloud”, but this comes with a
+cost.  To run a computation on a server, the user must be willing to share their
+data.  This loss of privacy is unacceptable for many users.
+
+A solution to the corresponding problem in the classical setting has recently
+been proposed in the form of fully homomorphic encryption.  The idea comes from
+a simple question: can we encrypt data and run arbitrary computations on it,
+without ever decrypting the data?  Surprisingly, Rivest et al. showed that this
+was possible \cite{rivest}.  If we want to perform computations in the quantum
+cloud, we would like the privacy provided by fully homomorphic encryption but
+the ability to pass around quantum data. This is the premise of quantum fully
+homomorphic encryption (QHE).
+
+\citet{liang2015}: This paper presents two QHE scheme based on CSS codes. One is
+symmetric, and the other is asymmetric. The encryption key is randomly chosen
+from the set of CSS codes, they encrypt simply by applying the code, and decrypt
+by reversing the CSS code. The evaluation of $H$ and $CNOT$ gates are simple.
+Since their encryption is just a CSS code, the fault tolerant versions of $H$
+and $CNOT$ are already homomorphic. For the $T$ gate they need an extra state
+$\ket{Phi}$. Since this state needs the same code that was applied when
+encrypting, the state has to be encrypted along with the message. They extend
+this to the asymmetric setting, by randomly adding errors to the encrypted code.
+It is still possible to apply the fault tolerant gates as before, but the
+encrypted message has to be sent back and re-encrypted periodically.
+
+\citet{lai2017}: Lai and Chung show that an IT-secure symmetric-key QFHE scheme
+cannot exist. They then give an IT-secure QHE scheme which can evaluate all
+circuits in the enlarged instantaneous quantum polynomial-time circuits called
+$IQP^+$, which is neither trivial nor universal. IQP+ is defined by the quantum
+gates X, Y, CNOT, R($\theta$), and CR($\theta$). R($\theta$) is a rotation by
+$\theta$ degrees and CR($\theta$) is a controlled version of the R($\theta$)
+gate. These two gates in particular can be implemented using quantum stabilizer
+codes which are simply quantum error-correcting codes where ancilla qubits are
+used to protect the qubits containing data. Indeed, concatenating these
+stabilizer codes together is the basis of the QHE scheme which Lai and Chung
+give which can be evaluated for any circuit in $IQP^+$. Of course, the main
+limitation of this scheme is that it is not universal since $IQP^+$ does not
+contain a universal set of gates. Since the scheme does have IT-security, it
+follows from the first result in this paper that it cannot support full quantum
+computation.
+
+Another class of QHE schemes has already been proposed. \citet{broadbent2015}
+and \citet{dulek2016} both use a quantum analog to Vernam’s one-time pad,
+formulated in \citet{ambainis2000}. Like Vernam’s cipher, the quantum one-time
+pad (qOTP) is information-theoretically (IT) secure. It involves applying to
+each qubit a random Pauli operation, $X^aZ^b$ for $a,b \in \{0,1\}$.
+\citet{ambainis2000} show that two random bits per qubit (corresponding to $a$
+and $b$) are both necessary and sufficient to produce IT-secure encryption.
+
+\citet{ambainis2000}: The authors define a private quantum channel (PQC), a set
+of probabilistically applied unitary operators or \textit{superoperator}, after
+whose application to a state, the resulting density matrix provides no
+information about the original state. They prove that applying random Pauli
+matrices to a state implements a PQC, and that $2n$ bits of randomness are
+enough to implement an $n$-qubit PQC. Furthermore, they show that their scheme
+reduces to classical OTP and requires just $n$ bits of randomness when applied
+to classical states. Hence their scheme can be viewed as the natural quantum
+extension of OTP (QOTP).
+
+\citet{liang2014}: The author proposes a variety of specific schemes that
+implement QOTP as defined in \cite{ambainis2000}. These schemes involve applying
+Pauli rotations about the $x$-, $y$-, and $z$-axes, determined by a shared
+secret key. The QFHE scheme the author proposes is both efficient and
+information-theoretically secure (ITS). This scheme is of dubious usefulness,
+however: no decryption is required to evaluate a circuit on the ciphertext, so
+the scheme is technically QFHE by the author's definition, but the evaluator
+must have access to the secret key, which violates other authors' definitions.
+Of more practical use, the author provides an ITS-QHE scheme that is homomorphic
+over Clifford gates and does not require the evaluator to have access to the
+secret key.
+
+\citet{broadbent2015}: This paper defines what it means for a quantum scheme to
+be CPA and CPA-mult secure. It then goes on to define the concept of
+homomorphic, and fully homomorphic, encryption in a quantum setting. Finally it
+gives homomorphic encryption schemes. CL, a quantum one time pad that's
+homomorphic on Clifford gates. EPR, a scheme based on adding EPR pairs to help
+correct for the errors introduced by adding T gates. AUX, a scheme designed to
+overcome the decryption increase in EPR by supplying auxiliary qubits to correct
+for the errors immediately. In the CL scheme they point out that  Pauli gates
+are a normal subgroup of the Clifford group, so if C is a clifford gate, then
+$CQ = Q'C$ for some $Q,Q'$ in the Pauli gates. Suppose we have a QOTP
+$X^{a_1}Z^{b_1}\otimes \ldots X^{a_n}Z^{b_n}$, then $C X^{a_1}Z^{b_1}\otimes
+\ldots X^{a_n}Z^{b_n} = X^{a_1'}Z^{b_1'}\otimes \ldots X^{a_n'}Z^{b_n'}C$ For
+some new key. This means applying a circuit $C$ is the same as updating the key
+correctly. EPR scheme: Trying this same trick with a T gate doesn't work,
+because $TX^aZ^b = X^aZ^{a\oplus b}P^aT$. The extra factor of $P^a$ forbids them
+from modifing the key $(a,b)$. They get around this by providing a pair of
+entangled qubits $\ket{\Phi^+}$. They modify one of the qubits by computing
+$\text{CNOT}(T\otimes I)$, tying it's state to the encrypted qubit. Then they
+apply $HP^{f_t}$ to the other and measure. Here $f_t$ count's the number of $T$
+gates we've applied. This corrects for the extra factor of $P$. However this
+means that the $HP$ gates are applied at decryption, which adds to the
+decryption time. Specifically it add $O(n^2)$ $P$ gates for $n$ $T$ gates. AUX
+scheme: The EPR scheme allows us to have $T$ gates, but it adds more to the
+decryption algorithm. This can quickly break the compactness restriction. An
+attempt to get around this is to encode some ``auxiliary states'' to account for
+the $P$ terms introduced. This has two major consequences. Since we have to
+prepare the auxiliary qubits in advance, and they depend on the encryption key,
+this has to be symmetric key encryption. The other consequence is that the cost
+of correcting the $P$ terms grows by adding cross terms that need to be
+corrected, similar to multiplying polynomials. This means that the evaluation
+key grows exponentially, since it has to account for all possible $P$
+corrections. The result is that this scheme can only have a constant number of
+$T$ gates.
+
+\citet{dulek2016}: The authors present a new scheme for QHE which is both
+compact and allows for efficient evaluation of arbitrary polynomial-sized
+quantum circuits based on the CL scheme of \cite{broadbent2015}. The error that
+a $T$ gate may incur is based on part of the secret key and so cannot be
+corrected during evaluation directly by a party for whom the secret key is
+unknown. To solve this, the authors propose so-called “gadgets” which consist of
+EPR pairs prepared in a way dependent on this secret key. Upon evaluating a $T$
+gate, the evaluator teleports the encrypted qubit through the gadget based on
+the encryption of the secret key. The gadgets are set up in such a way that this
+process completely corrects any unwanted phase-error introduced by the $T$ gate.
+By using gadgets to correct error during the evaluation of $T$ gates, this
+scheme has the advantages of not accumulating error during evaluation and
+requires only a single gadget per $T$ gate. It is also based on any classical
+leveled FHE scheme without making any assumptions about how this scheme works.
+This implies that any efficiency improvements in classical FHE will result in
+proportional efficiency improvements for this scheme.
+
+qOTP shares another property with Vernam’s cipher: It is “somewhat” homomorphic.
+Specifically, if we define $CL$, the Clifford group, as the set of operations
+generated by $\{X,Z,H,P,CNOT\}$, then for any encryption $\ket{\psi} =
+X^aZ^b\ket{\phi}$ and any gate $C \in CL$, $\exists c,d \in \{0,1\}$ s.t.
+$C\ket{\psi} = X^cZ^d\ket{\phi}$. Although this makes it possible to perform
+computations on ciphertexts, it is still just \textit{somewhat} homomorphic
+because $CL$ is not universal. Specifically, the Toffoli gate (and the $T$ gate,
+from which it can be constructed) is non-Clifford, meaning that $CL$ is not even
+universal for classical reversible computation.
+
+This result is strengthened by \citet{yu2014}. They show that the ciphertext of
+any IT-secure QHE must increase exponentially with the number of operations, as
+long as the set of permissible gates $S$ is universal for classical reversible
+computation or is a universal approximator for quantum computation.
+Exponentially increasing ciphertext breaks the locality requirement that
+Broadbent and Jeffery put on QHE---that decryption complexity must be
+independent of the number of computations. This means that any QHE primitive
+(e.g. qOTP) must relax at least one of these constraints: IT-security,
+universality, or locality. \citet{broadbent2015} and \citet{dulek2016} both
+relax the constraint that the scheme must be IT-secure, relying instead on
+computational security. Nonetheless, they use IT-secure qOTP as a primitive.
+
+\citet{alagic2016}: The authors define quantum analogues to various important
+classical security definitions, including certain proofs of equivalence. In
+particular, they give the definition of a quantum one-time pad and both
+private-key and public-key encryption in the quantum setting. Additionally, they
+provide definitions of the security properties of indistinguishability and
+semantic security along with a proof that the two definitions are equivalent.
+Finally, they show that quantum-secure one-way functions are enough to build a
+private-key quantum encryption scheme which is secure under chosen-ciphertext
+attack and that quantum-secure trapdoor one-way permutations imply
+semantically-secure public-key quantum encryption. Of particular interest is the
+definition of indistinguishability under chosen-plaintext attack (IND-CPA)
+security. Under this definition, an adversary is allowed to output a challenge
+plaintext along with some auxilliary information which even allows entanglement
+of the output with some internal state belonging to the adversary. The
+adversary’s goal is to distinguish between the encryption of their challenge and
+the zero state, where IND-CPA security implies that they can do no better than
+guessing.
+
+\citet{yu2014}: Since quantum computing has provided information-theoretic
+security (ITS) in other domains, we might hope that it would be possible to
+implement quantum homomorphic encryption with ITS. Alternatively, even if
+ITS-QHE is impossible, we might hope that ITS classical fully-homomorphic
+encryption (FHE) would be possible over quantum channels. On the contrary, Yu et
+al. prove a ``no-go'' theorem: They show that, in any QHE scheme where Bob
+obtains no information about Alice's data while performing his computation, the
+size of the ciphertext must increase exponentially after each operation,
+precluding any efficient ITS-QFHE scheme. This theorem holds even if the set of
+gates Bob can compute is not universal over unitary gates, but merely over
+classical reversible gates.
+
+\paragraph{Our question (revised)}: \citet{liang2014} define several kinds of
+QOTP, all of which support only a limited set of gates to be applied without
+access to the secret key. Can we find a QOTP scheme that supports a universal
+set of gates $G$?
+
+In other words, is there some sequence of gates $S$ with $|S| = s$ such that for
+any quantum state $\ket\phi$ and operation $U$, in some universal set of gates
+$G$, and bits $b_1,\dots,b_s \in \{0,1\}$,
+\begin{align}
+U (\prod_{i=1}^s S_i^{b_i}) \ket\phi = (\prod_{i=1}^s S_i^{b’_i}) U \ket\phi
+\end{align}
+where $b’_1,\dots,b’_s \in \{0,1\}$ and $\phi : (b_1,\dots,b_s, U) \mapsto
+b’_1,\dots,b’_s$ is a known mapping? One way to achieve this would be to let $N
+= \{(\prod_{i=1}^s S_i^{b_i})\}$ be a normal subgroup of $G$, since then
+\begin{align}
+U (\prod_{i=1}^s S_i^{b_i}) = (\prod_{i=1}^s S_i^{b’_i}) U
+\end{align}
+With the additional constraint that $b’_1,\dots,b’_s \in \{0,1\}$ be efficiently
+computable from $U$, this would give us the property that we need.
+
+\citet{yu2014} prove that, if such a gate set exists, it cannot perfectly hide
+the message unless the ciphertext grows exponentially with each homomorphic
+operation applied to it. Hence, we cannot hope that a scheme such as the one
+defined above would be IT-secure. Instead, we hope to apply the definition of
+quantum independence under chosen-plaintext attack (IND-CPA) provided by
+\citet{alagic2016} to show that such a scheme can be computationally secure.
+
+If we cannot find a QOTP scheme that supports a universal set of gates, we have
+two ancillary questions:
+\begin{compactenum}
+\item
+Is it impossible for an IND-CPA QOTP scheme to support a universal set of gates?
+Can we prove it?
+\item
+Can we find an IND-CPA QOTP scheme that supports at least the Toffoli gate?
+\end{compactenum}
+Answering the latter question in the affirmative would allow us to construct a
+QHE scheme that supports classical reversible computation, which is also
+impossible to do efficiently in an IT-secure setting.
+
+\bibliographystyle{plainnat}
+\bibliography{midterm}
+
+\end{document}

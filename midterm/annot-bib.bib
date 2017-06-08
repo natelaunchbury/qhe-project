@@ -1,0 +1,79 @@
+@misc{newman2017,
+title           = {
+Limitations on Transversal Computation through Quantum Homomorphic Encryption
+},
+author          = {Michael Newman and Yaoyun Shi},
+year            = {2017},
+month           = {April},
+howpublished    = {https://arxiv.org/abs/1704.07798},
+note            = {
+A gate $G$ is \textit{transversal} if, for some quantum error-correcting code
+(QECC), applying $G$ to a valid codeword produces another valid codeword. The
+authors use the results of \cite{yu2014} to argue that no additive QECC can
+transversally implement the Toffoli gate. They do this by assuming the existence
+of a QECC that implements Toffoli transversally and using it to construct an
+ITS-QHE that supports Toffoli and performs more efficiently than the lower bound
+proved by \cite{yu2014} allows.
+}
+}
+@misc{ambainis2000,
+title           = {Private Quantum Channels},
+author          = {
+Andris Ambainis and Michele Mosca and Alain Tapp and Ronald de Wolf
+},
+year            = {2000},
+month           = {January},
+howpublished    = {16th Annual Symposium on Foundations of Computer Science},
+note            = {
+The authors define a private quantum channel (PQC), a set of probabilistically
+applied unitary operators or \textit{superoperator}, after whose application to
+a state, the resulting density matrix provides no information about the original
+state. They prove that applying random Pauli matrices to a state implements a
+PQC, and that $2n$ bits of randomness are enough to implement an $n$-qubit PQC.
+Furthermore, they show that their scheme reduces to classical OTP and requires
+just $n$ bits of randomness when applied to classical states. Hence their scheme
+can be viewed as the natural quantum extension of OTP (QOTP).
+}
+}
+@misc{liang2014,
+title           = {
+Symmetric Quantum Fully Homomorphic Encryption with Perfect Security
+},
+author          = {Min Liang},
+year            = {2014},
+month           = {August},
+howpublished    = {https://arxiv.org/abs/1304.5087},
+note            = {
+The author proposes a variety of specific schemes that implement QOTP as defined
+in \cite{ambainis2000}. These schemes involve applying Pauli rotations about the
+$x$-, $y$-, and $z$-axes, determined by a shared secret key. The QFHE scheme the
+author proposes is both efficient and information-theoretically secure (ITS).
+This scheme is of dubious usefulness, however: no decryption is required to
+evaluate a circuit on the ciphertext, so the scheme is technically QFHE by the
+author's definition, but the evaluator must have access to the secret key, which
+violates other authors' definitions. Of more practical use, the author provides
+an ITS-QHE scheme that is homomorphic over Clifford gates and does not require
+the evaluator to have access to the secret key.
+}
+}
+@misc{yu2014,
+title           = {
+Limitations on Information Theoretically Secure Quantum Homomorphic Encryption
+},
+author          = {Li Yu and Carlos A. Perez-Delgado and Joseph F. Fitzsimons},
+year            = {2014},
+month           = {June},
+howpublished    = {https://arxiv.org/abs/1406.2456},
+note            = {
+Since quantum computing has provided information-theoretic security (ITS) in
+other domains, we might hope that it would be possible to implement quantum
+homomorphic encryption with ITS. Alternatively, even if ITS-QHE is impossible,
+we might hope that ITS classical fully-homomorphic encryption (FHE) would be
+possible over quantum channels. On the contrary, Yu et al. prove a ``no-go''
+theorem: They show that, in any QHE scheme where Bob obtains no information
+about Alice's data while performing his computation, the size of the ciphertext
+must increase exponentially after each operation, precluding any efficient
+ITS-QFHE scheme. This theorem holds even if the set of gates Bob can compute is
+not universal over unitary gates, but merely over classical reversible gates.
+}
+}

@@ -1,0 +1,179 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Quantum FHE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\sectionframe{Quantum Fully Homomorphic Encryption}
+
+\begin{frame}
+\frametitle{Goal}
+  Recall our goal: an encryption scheme with the following properties: \pause
+    \begin{enumerate}
+    \item the ciphertext does not reveal information about the plaintext (\textbf{security}) \pause
+    \item computation can be performed on the plaintext by a party who can only access the ciphertext (\textbf{homomorphism}) \pause
+    \item decryption takes roughly the same amount of time no matter which computation was performed (\textbf{compactness}) 
+   \end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{CL scheme}
+\begin{itemize} 
+  \item A compact, quantum encryption scheme which is homomorphic for all Clifford circuits. \pause
+  \item Unfortunately, the Clifford circuits are not universal, so this scheme is not fully homomorphic
+\end{itemize}
+\end{frame}
+ 
+\begin{frame}
+\frametitle{CL scheme}
+The definition of Clifford circuits is closely tied to Pauli operators: 
+\[ \forall C \in Clifford \text{ and } \forall Q \in Pauli, \; \exists Q' \in Pauli \; \text{s.t.  } CQ = Q'C. 
+\]
+\pause
+Then for any quantum state \ket{\psi},  $C(Q\ket{\psi}) = Q'(C\ket{\psi})$, \\ \pause
+\vspace*{5mm}
+This means that we can apply any $C$ to our encrypted state $Q\ket{\psi}$ and decrypt using $Q'$ to get $C\ket{\psi}$\\ \pause
+\vspace*{5mm}
+How do we find $Q'$?
+\end{frame}
+
+\begin{frame}
+\frametitle{CL scheme}
+How do we find $Q'$? \pause
+\vspace*{5mm}
+$Q'$ depends both on $Q$ and on $C$.
+\begin{itemize}
+  \item Recall $Q = X^aZ^b$ for some $a,b \in \{0,1\}$ \pause
+  \item Based on the definition of a Clifford circuit, $\forall C \in Clifford$, \[ CX^aZ^b = X^{a'}Z^{b'}C \text{ for some } a',b' \in \{0,1\} \] \pause
+  \item If we learn $a',b'$ then $Q' = X^{a'}Z^{b'}$ \pause
+  \item \textbf{Claim:} $\exists f_C$ such that $f_C(a, b) = (a', b')$ \pause
+  \begin{itemize}
+     \item Ex: Since $PX^aZ^b = X^aZ^{a \oplus b}P$, \hspace*{5mm} $f_P(a,b) = (a, a \oplus b)$ \pause  
+     \item There are similar rules for the other Clifford circuits
+  \end{itemize}  
+\end{itemize}
+\end{frame}
+ 
+\begin{frame}
+\frametitle{CL scheme}
+$\exists f_C$ such that $f_C(a, b) = (a', b')$ \\ \pause
+Alice sends Bob the ciphertext $Q\ket{\psi}$. Bob can simply:
+\begin{enumerate}
+  \item apply any $C \in Clifford$ to the ciphertext $Q\ket{\psi}$, 
+  \item compute $f_C(a,b)$
+  \item send $C(Q\ket{\psi})$ and $(a',b')$ to Alice for decryption (which will yield $C\ket{\psi}$ as desired). 
+\end{enumerate} \pause
+But Bob doesn't know $a,b$ since they form the secret key! \pause
+\vspace*{5mm}
+
+\textbf{Solution:} Since $a,b \in \{0,1\}$, Alice can use a \textit{classical} fully homomorphic encryption scheme to encrypt $(a,b) \rightarrow (c,d)$. She then sends $Q\ket{\psi}$ and $(c,d)$ to Bob who can \textit{homomorphically} evaluate $f_C(c,d)$ in step 2 without ever knowing the secret key. 
+\end{frame}
+ 
+\begin{frame}
+ \frametitle{QFHE}
+ \begin{itemize}
+   \item Since Clifford circuits are not universal, this scheme does not achieve fully homomorphic encryption
+   \item If we add T = $\begin{pmatrix} 1 & 0 \\ 0 & e^{\im \pi / 4}  \end{pmatrix}$ to the Clifford circuits, we get a universal gate set
+   \item But the T-gate introduces non-linear error: \\ 
+   \[  TX^aZ^b = X^aZ^{a \oplus b}P^aT  \]
+ \end{itemize}
+\end{frame}
+ 
+\begin{frame}
+ \frametitle{Error Correction}
+ \begin{itemize}
+    \item We need to solve how to update the keys when applying a T-gate to achieve fully homomorphic encryption
+   \item Goal: apply $P^{-1}$ iff $a = 1$. 
+   \item We want Bob to be able to do this but he doesn't know $a$ since it is part of the secret key
+ \end{itemize}
+\end{frame}
+ 
+\begin{frame}
+\frametitle{EPR scheme}
+\begin{enumerate}
+   \item Alice sends Bob $Q\ket{\psi}$ and Bob performs computations on this ciphertext
+   \item When Bob applies a T-gate, he uses an auxiliary qubit to entangle the conditional $P$ error correction. The variable $k_i$ is introduced for the $i$-th T-gate applied. 
+   \item Alice receives back both the ciphertext (modified by the computations Bob has performed) and all of these entangled qubits. She must perform some operations and measurements on each $k_i$ to determine whether or not to correct the $P$ error. 
+   \item Alice corrects the $P$ error and then decrypts as usual
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{EPR scheme - limitations}
+\begin{itemize}
+  \item Since $P$ error correction is delayed until decryption, the amount of work Alice has to do is no longer independent of the computations Bob performs
+  \item This scheme is not compact if a large number of T-gate operations are performed
+  \item Specifically, the complexity of decryption is $O(R^2)$ if $R$ is the number of T-gates applied
+  \end{itemize}
+\end{frame}
+ 
+ 
+\begin{frame}
+\frametitle{AUX scheme}
+\begin{enumerate}
+   \setcounter{enumi}{-1}
+   \item During key generation, AUX outputs a number of auxiliary states in the evaluation key
+   \item Alice sends Bob $Q\ket{\psi}$ and Bob performs computations on this ciphertext
+   \item When Bob applies a T-gate, he combines some of the auxiliary states to automatically correct the error
+   \item Alice receives back the ciphertext (modified by the computations Bob has performed) 
+   \item Alice decrypts as usual
+\end{enumerate}
+\end{frame}
+ 
+\begin{frame}
+\frametitle{AUX scheme - limitations}
+\begin{itemize}
+  \item Combining auxiliary states is expensive since it introduces ``cross terms'' which need to be corrected when T-gates are applied in the future
+  \item This scheme is only efficient for a \textit{constant} number of T-gates since the evaluation key size grows with power exponential in the number of T-gates 
+  \item AUX must be a symmetric-key encryption scheme since generating the auxiliary qubits depends on the encryption key (and Bob needs the key to combine states?)
+\end{itemize}
+\end{frame}
+ 
+\begin{frame}
+ \frametitle{Dulek et al. scheme}
+ \begin{enumerate}
+   \item Alice prepares error correction gargets and sends Bob $Q\ket{\psi}$ along with the gadgets. Bob performs computations on this ciphertext
+   \item When Bob applies a T-gate, he teleports the ciphertext through the gadget to correct that error
+   \item Alice receives back the ciphertext (modified by the computations Bob has performed)
+   \item Alice decrypts as usual
+\end{enumerate}
+\end{frame}
+ 
+\begin{frame}
+\frametitle{Dulek et al. scheme - limitations}
+\begin{itemize}
+  \item Alice needs to prepare a gadget for each T-gate (gadgets are destroyed after use)
+  \item Bob cannot create the gadgets otherwise the security of the scheme would break 
+  \item For this scheme to be efficient, there can only be a polynomial number of T-gates (so that only a polynomial number of gadgets need to be prepared). This is called ``levelled FHE'' 
+\end{itemize}
+\end{frame}
+ 
+\begin{frame}
+\frametitle{Conclusions}
+\begin{itemize}
+  \item ``Historically, such results appeared as precursors to the breakthrough result establishing classical fully homomorphic encryption" - Broadbent, Jeffery 2015
+  \end{itemize}
+  \end{frame}
+ 
+ \begin{frame}
+ \frametitle{Dulek et al}
+ \begin{itemize}
+   \item \textbf{Key Gen:} 
+   \begin{itemize}
+     \item Generate classical keys
+     \item Prepare gadgets
+   \end{itemize}
+   \item \textbf{Encryption:} 
+   \begin{itemize}
+     \item quantum one-time pad to message
+     \item classical FHE on secret keys
+   \end{itemize}
+   \item \textbf{Evaluation:}
+    \begin{itemize}
+     \item for each Clifford circuit, classically update keys (as in CL scheme)
+     \item for each T-gate, update keys using a gadget
+   \end{itemize}
+   \item \textbf{Decryption:}
+   \begin{itemize}
+     \item decrypt pad keys using classical FHE decryption
+     \item use pad keys to decrypt one-time pad
+    \end{itemize}
+ \end{itemize}
+ \end{frame}
